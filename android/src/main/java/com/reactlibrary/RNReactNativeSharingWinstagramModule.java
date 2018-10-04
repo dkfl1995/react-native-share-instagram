@@ -113,7 +113,15 @@ public class RNReactNativeSharingWinstagramModule extends ReactContextBaseJavaMo
         public void onActivityResult(Activity activity, final int requestCode, final int resultCode, final Intent intent) {
             Log.d("------------>resultCode", "" + resultCode);
             if (requestCode == INSTAGRAM_SHARE_REQUEST) {
-                callback.invoke("Image shared successfully with instagram.");
+                // Check if result brought to MainActivity isnt null,
+                // else it causes callback invocation failure
+                if (intent != null) {
+                    if (resultCode != 0) {
+                        callback.invoke("Image shared successfully with instagram.");
+                    } else if (requestCode == 0) {
+                        callback.invoke("Cancelled to share or share was unsuccessful");
+                    }
+                }
             }
         }
     }
