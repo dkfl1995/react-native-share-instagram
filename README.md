@@ -9,6 +9,42 @@ Share your image with the Instagram app using `Intents` (iOS & Android)
 
 `$ react-native link @micabe/react-native-share-instagram`
 
+## Update!!!
+
+* Android installation changed!
+    You need to add `import com.reactlibrary.InstagramApplication` and `InstagramApplication` near `ReactApplication` to implement it in your MainApplication.java:
+    ```java
+    public class MainApplication extends Application implements InstagramApplication, ReactApplication {
+
+    private static CallbackManager mCallbackManager = CallbackManager.Factory.create();
+
+  protected static CallbackManager getCallbackManager() {
+    return mCallbackManager;
+  }
+
+  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+    @Override
+    public boolean getUseDeveloperSupport() {
+      return BuildConfig.DEBUG;
+    }
+
+    @Override
+    protected List<ReactPackage> getPackages() {
+      return Arrays.<ReactPackage>asList(
+        new MainReactPackage(),
+        new RNSharePackage(),
+        ...
+      )
+    }
+
+    //Add here (after getPackages method)
+    public String getFileProviderAuthority() {
+      return "com.foodilog.provider";
+    }
+
+  }
+    ```
+
 
 ## Usage
 ```javascript

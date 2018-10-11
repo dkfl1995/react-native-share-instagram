@@ -32,6 +32,7 @@ import android.os.Environment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.support.v4.content.FileProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -66,7 +67,8 @@ public class RNReactNativeSharingWinstagramModule extends ReactContextBaseJavaMo
         return false;
     }
 
-    private File saveImage(final Context context, String fileName, final String imageData) {
+    private Uri saveImage(final Context context, String fileName, final String imageData) {
+        final String authority = ((InstagramApplication) reactContext.getApplicationContext()).getFileProviderAuthority();
         final byte[] imgBytesData = Base64.decode(imageData, Base64.DEFAULT);
         final File file;
 
@@ -97,7 +99,7 @@ public class RNReactNativeSharingWinstagramModule extends ReactContextBaseJavaMo
     			e.printStackTrace();
           return null;
     		}
-        return file;
+        return FileProvider.getUriForFile(reactContext, authority, file);
     }
 
     final int INSTAGRAM_SHARE_REQUEST = 500;
@@ -138,12 +140,12 @@ public class RNReactNativeSharingWinstagramModule extends ReactContextBaseJavaMo
 
        String type = "image/jpeg";
 
-       File media = saveImage(getReactApplicationContext(), fileName, base64str);
+       Uri media = saveImage(getReactApplicationContext(), fileName, base64str);
 
          if(isAppInstalled("com.instagram.android") == false) {
            callback.invoke("Sorry, instagram is not installed in your device.");
          } else {
-           if(media.exists()) {
+           if(media.getPath() != null) {
              // Create the new Intent using the 'Send' action.
              Intent share = new Intent(Intent.ACTION_SEND);
 
@@ -151,10 +153,11 @@ public class RNReactNativeSharingWinstagramModule extends ReactContextBaseJavaMo
              share.setType(type);
              share.setPackage("com.instagram.android");
 
-             Uri uri = Uri.fromFile(media);
+//             Uri uri = Uri.fromFile(media);
+//               Uri uri = FileProvider.getUriForFile(reactContext, authority, media);
 
              // Add the URI to the Intent.
-             share.putExtra(Intent.EXTRA_STREAM, uri);
+             share.putExtra(Intent.EXTRA_STREAM, media);
 
              // Broadcast the Intent.
              currentActivity.startActivityForResult(Intent.createChooser(share, "Share to"), INSTAGRAM_SHARE_REQUEST);
